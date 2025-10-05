@@ -1,0 +1,11 @@
+# polarbadge
+
+## quickstart
+
+``` bash
+uv install
+cp config.toml.example config.toml
+uv run ./cli.py pp33-everyone
+# or
+uv run ./cli.py pp33-user -u 1234
+```

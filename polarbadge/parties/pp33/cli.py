@@ -14,11 +14,11 @@ _config = get_config()
 
 REGEX_UUID = re.compile(r"^[0-9a-f\-]{30,50}$")
 
-def everyone():
+def pp33_everyone():
     generate_badges()
 
 @click.option("--user", "-u", multiple=True)
-def users(user: list[int]):
+def pp33_users(user: list[int]):
     users = list(map(int, user))
     generate_badges(user_ids=users)
 
