@@ -1,0 +1,8 @@
+[general]
+output_path="/tmp/"
+
+[geekevents]
+username="user"
+secret="secret"
+base_url="https://www.geekevents.org"
+party_id=1234

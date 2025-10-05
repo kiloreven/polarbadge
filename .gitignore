@@ -1,0 +1,19 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Environment stuffs
+.idea
+
+# Virtual environments
+.venv
+
+# Config files
+config.toml
+
+# Vim swap
+*.sw[ponml]

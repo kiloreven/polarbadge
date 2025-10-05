@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html style="margin: 0; padding: 0; width: {{ card.width_px }}px; height: {{ card.height_px }}px;">
+
+  <head>
+    <style>
+      @page {
+        margin: 0;
+        size: {{ design.width_mm }}mm {{ design.height_mm }}mm;
+      }
+      
+      html, body, p {
+        margin: 0;
+      }
+
+      .fullPageImage {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: {{ design.width_mm }}mm;
+        height: {{ design.height_mm }}mm;
+      }
+
+      .textBox {
+        position: fixed;
+        display: block;
+        overflow: visible;
+        z-index: 200;
+        color: #{{ design.base_font.color }};
+        font-size: {{ design.base_font.size_pt }}pt;
+      }
+
+      #background {
+        z-index: 1;
+      }
+
+      #foreground {
+        z-index: 100;
+      }
+
+      #profilePicture {
+        display: block; 
+        position: fixed;
+        z-index: 50;
+        top: {{ design.image_profile.anchor_y_mm }}mm;
+        left: {{ design.image_profile.anchor_x_mm }}mm;
+        width: {{ design.image_profile.width_mm }}mm;
+        height: {{ design.image_profile.height_mm }}mm;
+      }
+
+      {% if design.code_2d_box %}
+      #barcode {
+          display: block;
+          position: fixed;
+          z-index: 200;
+          top: {{ design.code_2d_box.anchor_y_mm }}mm;
+          left: {{ design.code_2d_box.anchor_x_mm }}mm;
+          width: {{ design.code_2d_box.size_mm }}mm;
+          height: {{ design.code_2d_box.size_mm }}mm;
+      }
+
+      #barcode img {
+          width: 100%;
+          height: 100%;
+      }
+
+      {% if design.code_2d_box.id_text_font %}
+      #barcodeText {
+        display: block;
+        position: fixed;
+        overflow: visible;
+        top: {{ design.code_2d_box.anchor_y_mm + design.code_2d_box.size_mm }}mm;
+        left: {{ design.code_2d_box.anchor_x_mm }}mm;
+        width: {{ design.code_2d_box.size_mm }}mm;
+        height: {{ design.code_2d_box.size_mm }}mm;
+      }
+      #barcodeText span {
+          margin-left: -100%;
+          margin-right: -100%;
+          display: block;
+          text-align: center;
+      }
+      {% endif %}
+      {% endif %}
+
+      #profilePicture img {
+        object-fit: {{ design.image_profile.scaling }};
+        width: 100%;
+        height: 100%;
+      }
+
+      {% if debug %}
+      * {
+        border: 1px red solid;
+      }
+      {% endif %}
+
+    </style>
+  </head>
+  
+  <body>
+    <div id="card">
+
+        <img class="fullPageImage" id="background" src="data:image/png;base64, {{ design.background_b64 }}"/>
+        <img class="fullPageImage" id="foreground" src="data:image/png;base64, {{ design.foreground_b64 }}"/>
+
+        <div id="profilePicture">
+            <img src="data:image/png;base64, {{ subject.pic_b64 }}">
+        </div>
+
+        <div class="textBox" id="textNick" style="{{ design.text_nick.css }}">
+            <p style="display: inline; vertical-align: {{ design.text_nick.align_y }}">{{ subject.nick }}</p>
+        </div>
+
+        <div class="textBox" id="textName" style="{{ design.text_name.css }}">
+            <p style="display: inline; vertical-align: {{ design.text_name.align_y }}">{{ subject.name }}</p>
+        </div>
+
+        <div class="textBox" id="textCrew" style="{{ design.text_crew.css }}">
+            <svg viewBox="0 0 {{ design.text_crew.width_mm }} {{ design.text_crew.height_mm }}">
+
+              <text x="0" y="0">{{ subject.crew }}</text>
+            </svg>
+            <p style="display: inline; vertical-align: {{ design.text_crew.align_y }}">{{ subject.crew }}</p>
+        </div>
+
+        {% if subject.code_b64 %}
+            <div class="2DBarcode" id="barcode">
+                <img src="data:image/png;base64, {{ subject.code_b64 }}" />
+                {% if design.code_2d_box.id_text_font %}
+                <p id="barcodeText" class=textBox" style="{{ design.code_2d_box.id_text_font.css }}">
+                    <span>{{ subject.user_id }}</span>
+                </p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    </div>
+  </body>
+
+</html>
