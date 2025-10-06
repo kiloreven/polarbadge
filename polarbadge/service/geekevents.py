@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 
 from requests.auth import HTTPBasicAuth
 
-from polarbadge.models.geekevents import CrewMember, GEConfig
+from polarbadge.models.geekevents import CrewMember, GEConfig, CrewMemberList
 from polarbadge.service.config import get_config
 
 _config = get_config()
@@ -46,10 +46,10 @@ class GEClient:
         return response
 
 
-    def get_crew_members(self) -> list[CrewMember]:
+    def get_crew_members(self) -> CrewMemberList:
         path = f"/event/{self._party_id}/crew/api/crew-list/"
         response = self.request(path).json()
-        return [CrewMember(**item) for item in response.values()]
+        return CrewMemberList(members=[CrewMember(**item) for item in response.values()])
 
     def get_picture(self, path: str) -> bytes:
         response = self.request(path)

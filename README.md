@@ -1,5 +1,17 @@
 # polarbadge
 
+## requirements
+
+- libpango
+- ghostscript
+- poppler-utils
+
+Fedora prep:
+
+``` bash
+sudo dnf install -y pango-devel ghostscript poppler-utils
+```
+
 ## quickstart
 
 ``` bash

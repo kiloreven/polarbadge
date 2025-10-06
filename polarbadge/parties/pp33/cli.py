@@ -24,7 +24,7 @@ def pp33_users(user: list[int]):
 
 def generate_badges(user_ids: list | None = None):
     click.echo("Generating badges...")
-    crew_members = _client.get_crew_members()
+    crew_members = _client.get_crew_members().members
     if user_ids is not None:
         crew_members = [crew_member for crew_member in crew_members if crew_member.user_id in user_ids]
 
@@ -58,3 +58,48 @@ def generate_badges(user_ids: list | None = None):
         render_to_image(file_path + ".bmp", design, html)
 
         click.secho(f"{i+1}/{number_of_crew_members} - Generating badge for {crew.full_name}", fg="blue")
+
+
+@click.option("--dump-file", help="Dump file path, will be created if not exists", required=True)
+@click.option("--users-file", help="File we'll put the registered data into", default="./users.csv")
+def register(dump_file: str, users_file: str):
+    if os.path.exists(dump_file):
+        with open(dump_file, "r") as f:
+            from polarbadge.models.geekevents import CrewMemberList
+            crew_list = CrewMemberList.model_validate_json(f.read())
+    else:
+        crew_list = _client.get_crew_members()
+        with open(dump_file, "w") as f:
+            f.write(crew_list.model_dump_json())
+
+    crew_map = {crew_member.user_id: crew_member for crew_member in crew_list.members}
+
+    _continue = True
+    while _continue:
+        member_id = click.prompt("GE User ID (write 'exit' if you're done)", type=str)
+        if member_id == "exit":
+            _continue = False
+            return
+
+        try:
+            user = crew_map.get(int(member_id))
+        except ValueError:
+            click.secho(f"Invalid user ID", fg="red")
+            continue
+
+        if user is None:
+            click.secho(f"User {member_id } not found, try again", fg="red")
+            continue
+
+        click.secho(f"Found user {user.username} ({user.full_name})", fg="blue")
+        try:
+            nfc_id = click.prompt("NFC ID (scan card)", type=str)
+        except ValueError:
+            click.secho("Invalid NFC ID", fg="red")
+            continue
+
+        with open(users_file, mode="a") as f:
+            line = [member_id, nfc_id, user.username, user.full_name, user.crew]
+            line_formatted = ",".join(map(str, line))
+            f.write(line_formatted + "\n")
+            click.secho(f"Saved user: {line_formatted}", fg="green")

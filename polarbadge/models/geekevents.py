@@ -22,6 +22,10 @@ class CrewMember(BaseModel):
         return f"{self.first_name} {self.last_name}"
 
 
+class CrewMemberList(BaseModel):
+    members: list[CrewMember]
+
+
 class GEConfig(BaseModel):
     base_url: str
     username: str
