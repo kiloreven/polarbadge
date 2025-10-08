@@ -1,4 +1,3 @@
-import json
 import os
 import re
 
@@ -60,18 +59,9 @@ def generate_badges(user_ids: list | None = None):
         click.secho(f"{i+1}/{number_of_crew_members} - Generating badge for {crew.full_name}", fg="blue")
 
 
-@click.option("--dump-file", help="Dump file path, will be created if not exists", required=True)
 @click.option("--users-file", help="File we'll put the registered data into", default="./users.csv")
-def register(dump_file: str, users_file: str):
-    if os.path.exists(dump_file):
-        with open(dump_file, "r") as f:
-            from polarbadge.models.geekevents import CrewMemberList
-            crew_list = CrewMemberList.model_validate_json(f.read())
-    else:
-        crew_list = _client.get_crew_members()
-        with open(dump_file, "w") as f:
-            f.write(crew_list.model_dump_json())
-
+def register(users_file: str):
+    crew_list = _client.get_crew_members()
     crew_map = {crew_member.user_id: crew_member for crew_member in crew_list.members}
 
     _continue = True
