@@ -7,7 +7,13 @@
         margin: 0;
         size: {{ design.width_mm }}mm {{ design.height_mm }}mm;
       }
-      
+      {% for font in design.get_external_fonts() %}
+      @font-face {
+        font-family: {{ font.family_name }};
+        src: url({{ font.full_path }});
+}
+      {% endfor %}
+
       html, body, p {
         margin: 0;
       }

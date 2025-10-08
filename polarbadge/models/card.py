@@ -1,5 +1,6 @@
 from base64 import b64encode
 from decimal import Decimal
+from pathlib import Path
 from typing import Self, Literal
 
 
@@ -27,6 +28,11 @@ class CardType(BaseModel):
 class ExternalFontFamily(BaseModel):
     path: str
     family_name: str
+
+    @property
+    def full_path(self) -> str:
+        path = Path(self.path)
+        return f"file://{path.absolute()}"
 
 
 class Font(BaseModel):
@@ -163,13 +169,38 @@ class Design(BaseModel):
         return self.card.height_px if self.is_portrait else self.card.width_px
 
     @property
-    def background_b64(self) -> str:
+    def background_b64(self) -> str | None:
         if self.background_png:
             with open(self.background_png.path, "br") as f:
                 return b64encode(f.read()).decode("utf-8")
 
     @property
-    def foreground_b64(self) -> str:
+    def foreground_b64(self) -> str| None:
         if self.foreground_png:
             with open(self.foreground_png.path, "br") as f:
                 return b64encode(f.read()).decode("utf-8")
+
+    def get_external_fonts(self) -> list[ExternalFontFamily]:
+        # Path to all the potential fonts we have
+        font_paths = [
+            "base_font",
+            "text_nick.font_override",
+            "text_name.font_override",
+            "text_crew.font_override",
+            "code_2d_box.id_text_font",
+        ]
+        found_fonts = {}
+        for path in font_paths:
+            parts = path.split(".")
+            part = parts.pop(0)
+            item = getattr(self, part, None)
+            for part in parts:
+                item = getattr(item, part, None)
+                if isinstance(item, Font) and isinstance(item.family, ExternalFontFamily):
+                    font = item.family
+                    if font.family_name in found_fonts and font != found_fonts[font.family_name]:
+                        print(f"Error: font family name '{font}' is already used. Skipping font for {path} in design")
+                        continue
+                    found_fonts[font.family_name] = font
+
+        return list(found_fonts.values())
