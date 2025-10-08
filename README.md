@@ -15,7 +15,7 @@ sudo dnf install -y pango-devel ghostscript poppler-utils
 ## quickstart
 
 ``` bash
-uv install
+uv sync
 cp config.toml.example config.toml
 uv run ./cli.py pp33-everyone
 # or
